@@ -1,0 +1,180 @@
+/* ===========================
+   Responsive Design - Mobile First Approach
+   =========================== */
+
+/* ===========================
+   Small Devices (phones, 360px and up)
+   This is the base, mobile-first design
+   =========================== */
+@media (max-width: 360px) {
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+    
+    header h1 {
+        font-size: 1.25rem;
+    }
+    
+    .nav-list {
+        flex-direction: column;
+    }
+    
+    .nav-link {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ===========================
+   Medium Devices (tablets, 768px and up)
+   =========================== */
+@media (min-width: 768px) {
+    /* Navigation */
+    .nav-list {
+        justify-content: center;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Controls Panel */
+    .controls-panel {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .search-box {
+        flex: 1;
+    }
+    
+    /* Table visible, cards hidden */
+    .table-responsive {
+        display: block;
+    }
+    
+    .books-cards {
+        display: none;
+    }
+    
+    /* Form */
+    #book-form {
+        padding: var(--spacing-2xl);
+    }
+}
+
+/* ===========================
+   Large Devices (desktops, 1024px and up)
+   =========================== */
+@media (min-width: 1024px) {
+    /* Container */
+    .container {
+        padding: 0 var(--spacing-xl);
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    /* Navigation */
+    .nav-list {
+        justify-content: flex-start;
+    }
+    
+    /* Main content wider spacing */
+    main {
+        padding: var(--spacing-2xl) 0;
+    }
+    
+    section h2 {
+        font-size: 2rem;
+    }
+}
+
+/* ===========================
+   Small Devices - Mobile Cards View
+   =========================== */
+@media (max-width: 767px) {
+    /* Hide table, show cards */
+    .table-responsive {
+        display: none;
+    }
+    
+    .books-cards {
+        display: block;
+    }
+    
+    /* Stack form actions */
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+    
+    /* Stack settings items */
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .setting-item label {
+        min-width: auto;
+    }
+    
+    /* Target display */
+    .target-display {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .target-display input {
+        width: 100%;
+    }
+}
+
+/* ===========================
+   Print Styles
+   =========================== */
+@media print {
+    nav,
+    footer,
+    .controls-panel,
+    .form-actions,
+    .action-btn {
+        display: none;
+    }
+    
+    main {
+        padding: 0;
+    }
+    
+    .books-table {
+        font-size: 0.85rem;
+    }
+}
+
+/* ===========================
+   Reduced Motion (Accessibility)
+   =========================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ===========================
+   Dark Mode Support (Optional - Stretch)
+   =========================== */
+@media (prefers-color-scheme: dark) {
+    /* TODO: Add dark mode styles if implementing theme toggle */
+}

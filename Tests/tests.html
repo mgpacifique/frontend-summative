@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests - Book & Notes Vault</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f8fafc;
+        }
+
+        h1 {
+            color: #0f172a;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            color: #475569;
+            margin: 2rem 0 1rem;
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 0.5rem;
+        }
+
+        .test-group {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-case {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-left: 4px solid #cbd5e1;
+            background-color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .test-case.pass {
+            border-left-color: #10b981;
+            background-color: #f0fdf4;
+        }
+
+        .test-case.fail {
+            border-left-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .test-name {
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        .test-result {
+            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+        }
+
+        .test-result.pass {
+            color: #10b981;
+            background-color: #d1fae5;
+        }
+
+        .test-result.fail {
+            color: #ef4444;
+            background-color: #fee2e2;
+        }
+
+        .test-details {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        code {
+            background-color: #e2e8f0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>📚 Book & Notes Vault - Test Suite</h1>
+
+    <div id="summary" class="summary">
+        <h3>Test Summary</h3>
+        <div class="summary-stats">
+            <div class="stat">
+                <span class="stat-label">Total Tests</span>
+                <span class="stat-value" id="total-tests">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Passed</span>
+                <span class="stat-value" id="passed-tests">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Failed</span>
+                <span class="stat-value" id="failed-tests">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="test-results"></div>
+
+<script type="module">
+        import { 
+            validateTitle, 
+            validateAuthor, 
+            validatePages, 
+            validateTag, 
+            validateDate,
+            findDuplicateWords,
+            patterns 
+        } from './scripts/validators.js';
+        
+        import { compileRegex, highlightMatches } from './scripts/search.js';
+
+        // Simple test framework
+        class TestRunner {
+            constructor() {
+                this.tests = [];
+                this.results = [];
+            }
+
+            test(name, fn) {
+                this.tests.push({ name, fn });
+            }
+
+            async run() {
+                for (const test of this.tests) {
+                    try {
+                        await test.fn();
+                        this.results.push({ name: test.name, passed: true });
+                    } catch (error) {
+                        this.results.push({ name: test.name, passed: false, error: error.message });
+                    }
+                }
+                this.renderResults();
+            }
+
+            renderResults() {
+                const container = document.getElementById('test-results');
+                const groupedResults = this.groupResults();
+                
+                for (const [group, tests] of Object.entries(groupedResults)) {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'test-group';
+                    
+                    const heading = document.createElement('h2');
+                    heading.textContent = group;
+                    groupDiv.appendChild(heading);
+                    
+                    tests.forEach(result => {
+                        const testDiv = document.createElement('div');
+                        testDiv.className = `test-case ${result.passed ? 'pass' : 'fail'}`;
+                        
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = 'test-name';
+                        nameSpan.textContent = result.name;
+                        
+                        const resultSpan = document.createElement('span');
+                        resultSpan.className = `test-result ${result.passed ? 'pass' : 'fail'}`;
+                        resultSpan.textContent = result.passed ? '✓ PASS' : '✗ FAIL';
+                        
+                        testDiv.appendChild(nameSpan);
+                        testDiv.appendChild(resultSpan);
+                        
+                        if (!result.passed) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'error-message';
+                            errorDiv.textContent = result.error;
+                            testDiv.appendChild(errorDiv);
+                        }
+                        
+                        groupDiv.appendChild(testDiv);
+                    });
+                    
+                    container.appendChild(groupDiv);
+                }
+                
+                this.updateSummary();
+            }
+
+            groupResults() {
+                const grouped = {};
+                this.results.forEach(result => {
+                    const group = result.name.split(':')[0];
+                    if (!grouped[group]) {
+                        grouped[group] = [];
+                    }
+                    grouped[group].push(result);
+                });
+                return grouped;
+            }
+
+            updateSummary() {
+                const total = this.results.length;
+                const passed = this.results.filter(r => r.passed).length;
+                const failed = total - passed;
+                
+                document.getElementById('total-tests').textContent = total;
+                document.getElementById('passed-tests').textContent = passed;
+                document.getElementById('failed-tests').textContent = failed;
+            }
+        }
+
+        // Assertion helper
+        function assert(condition, message) {
+            if (!condition) {
+                throw new Error(message || 'Assertion failed');
+            }
+        }
+
+        function assertEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(message || `Expected ${expected}, got ${actual}`);
+            }
+        }
+
+        // Create test runner
+        const runner = new TestRunner();
+
+        // ===========================
+        // Validator Tests
+        // ===========================
+
+        runner.test('Validators: Title - valid with no extra spaces', () => {
+            const result = validateTitle('Clean Title');
+            assert(result.valid, 'Should accept clean title');
+        });
+
+        runner.test('Validators: Title - reject leading space', () => {
+            const result = validateTitle(' Leading Space');
+            assert(!result.valid, 'Should reject leading space');
+        });
+
+        runner.test('Validators: Title - reject trailing space', () => {
+            const result = validateTitle('Trailing Space ');
+            assert(!result.valid, 'Should reject trailing space');
+        });
+
+        runner.test('Validators: Title - reject double spaces', () => {
+            const result = validateTitle('Double  Space');
+            assert(!result.valid, 'Should reject double spaces');
+        });
+
+        runner.test('Validators: Title - reject empty', () => {
+            const result = validateTitle('');
+            assert(!result.valid, 'Should reject empty title');
+        });
+
+        runner.test('Validators: Author - valid name', () => {
+            const result = validateAuthor('John Smith');
+            assert(result.valid, 'Should accept valid author name');
+        });
+
+        runner.test('Validators: Author - valid with hyphen', () => {
+            const result = validateAuthor('Mary-Jane Watson');
+            assert(result.valid, 'Should accept hyphenated names');
+        });
+
+        runner.test('Validators: Author - reject numbers', () => {
+            const result = validateAuthor('John123');
+            assert(!result.valid, 'Should reject numbers in author name');
+        });
+
+        runner.test('Validators: Author - reject empty', () => {
+            const result = validateAuthor('');
+            assert(!result.valid, 'Should reject empty author');
+        });
+
+        runner.test('Validators: Pages - valid positive integer', () => {
+            const result = validatePages('250');
+            assert(result.valid, 'Should accept positive integer');
+        });
+
+        runner.test('Validators: Pages - reject zero', () => {
+            const result = validatePages('0');
+            assert(!result.valid, 'Should reject zero pages');
+        });
+
+        runner.test('Validators: Pages - reject negative', () => {
+            const result = validatePages('-10');
+            assert(!result.valid, 'Should reject negative pages');
+        });
+
+        runner.test('Validators: Pages - reject decimal', () => {
+            const result = validatePages('25.5');
+            assert(!result.valid, 'Should reject decimal pages');
+        });
+
+        runner.test('Validators: Tag - valid single word', () => {
+            const result = validateTag('Fiction');
+            assert(result.valid, 'Should accept single word tag');
+        });
+
+        runner.test('Validators: Tag - valid multi-word', () => {
+            const result = validateTag('Science Fiction');
+            assert(result.valid, 'Should accept multi-word tag');
+        });
+
+        runner.test('Validators: Tag - valid with hyphen', () => {
+            const result = validateTag('Non-Fiction');
+            assert(result.valid, 'Should accept hyphenated tag');
+        });
+
+        runner.test('Validators: Tag - reject numbers', () => {
+            const result = validateTag('Fiction123');
+            assert(!result.valid, 'Should reject numbers in tag');
+        });
+
+        runner.test('Validators: Date - valid YYYY-MM-DD', () => {
+            const result = validateDate('2025-09-25');
+            assert(result.valid, 'Should accept valid date');
+        });
+
+        runner.test('Validators: Date - reject invalid format', () => {
+            const result = validateDate('25-09-2025');
+            assert(!result.valid, 'Should reject DD-MM-YYYY format');
+        });
+
+        runner.test('Validators: Date - reject invalid month', () => {
+            const result = validateDate('2025-13-25');
+            assert(!result.valid, 'Should reject invalid month');
+        });
+
+        runner.test('Validators: Date - reject invalid day', () => {
+            const result = validateDate('2025-09-32');
+            assert(!result.valid, 'Should reject invalid day');
+        });
+
+        // ===========================
+        // Advanced Regex Tests
+        // ===========================
+
+        runner.test('Advanced Regex: Detect duplicate words', () => {
+            const text = 'This is is a test';
+            const duplicates = findDuplicateWords(text);
+            assert(duplicates.length > 0, 'Should find duplicate word');
+            assert(duplicates.includes('is'), 'Should find "is" as duplicate');
+        });
+
+        runner.test('Advanced Regex: No duplicates in clean text', () => {
+            const text = 'This is a clean sentence';
+            const duplicates = findDuplicateWords(text);
+            assertEqual(duplicates.length, 0, 'Should find no duplicates');
+        });
+
+        runner.test('Advanced Regex: Title pattern matches clean text', () => {
+            assert(patterns.title.test('Clean Title'), 'Should match clean title');
+        });
+
+        runner.test('Advanced Regex: Title pattern rejects leading space', () => {
+            assert(!patterns.title.test(' Leading'), 'Should reject leading space');
+        });
+
+        // ===========================
+        // Search Tests
+        // ===========================
+
+        runner.test('Search: Compile valid regex', () => {
+            const regex = compileRegex('test');
+            assert(regex !== null, 'Should compile valid regex');
+            assert(regex instanceof RegExp, 'Should return RegExp object');
+        });
+
+        runner.test('Search: Handle invalid regex', () => {
+            const regex = compileRegex('[invalid');
+            assert(regex === null, 'Should return null for invalid regex');
+        });
+
+        runner.test('Search: Highlight matches', () => {
+            const text = 'Hello world';
+            const regex = /world/gi;
+            const highlighted = highlightMatches(text, regex);
+            assert(highlighted.includes('<mark>'), 'Should include <mark> tag');
+            assert(highlighted.includes('world'), 'Should include original text');
+        });
+
+        runner.test('Search: Return original text when no regex', () => {
+            const text = 'Hello world';
+            const highlighted = highlightMatches(text, null);
+            assertEqual(highlighted, text, 'Should return original text');
+        });
+
+        // ===========================
+        // Pattern Matching Tests
+        // ===========================
+
+        runner.test('Patterns: Category pattern - single word', () => {
+            assert(patterns.category.test('Fiction'), 'Should match single word');
+        });
+
+        runner.test('Patterns: Category pattern - hyphenated', () => {
+            assert(patterns.category.test('Non-Fiction'), 'Should match hyphenated');
+        });
+
+        runner.test('Patterns: Category pattern - spaces', () => {
+            assert(patterns.category.test('Science Fiction'), 'Should match with spaces');
+        });
+
+        runner.test('Patterns: Pages pattern - positive integer', () => {
+            assert(patterns.pages.test('250'), 'Should match positive integer');
+        });
+
+        runner.test('Patterns: Pages pattern - reject zero leading', () => {
+            assert(!patterns.pages.test('0250'), 'Should reject zero-leading number');
+        });
+
+        runner.test('Patterns: Date pattern - valid date', () => {
+            assert(patterns.date.test('2025-09-25'), 'Should match valid date');
+        });
+
+        runner.test('Patterns: Date pattern - reject invalid format', () => {
+            assert(!patterns.date.test('09/25/2025'), 'Should reject slash format');
+        });
+
+        // Run all tests
+        runner.run();
+    </script>
+</body>
+</html>
