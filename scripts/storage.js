@@ -74,6 +74,8 @@ export function saveSettings(settings) {
 export function clearAllData() {
     try {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(SETTINGS_KEY);
+        localStorage.removeItem('visited');
         return true;
     } catch (error) {
         console.error('Error clearing data:', error);
@@ -102,30 +104,30 @@ export function exportToJSON(books) {
  */
 export function importFromJSON(jsonString) {
     const result = { valid: false, data: null, errors: [] };
-    
+
     try {
         const data = JSON.parse(jsonString);
-        
+
         // Validate that data is an array
         if (!Array.isArray(data)) {
             result.errors.push('Data must be an array of books');
             return result;
         }
-        
+
         // Validate each book object
         const requiredFields = ['title', 'author', 'pages', 'tag', 'date'];
         const ids = new Set();
-        
+
         for (let i = 0; i < data.length; i++) {
             const book = data[i];
-            
+
             // Check required fields
             for (const field of requiredFields) {
                 if (!book[field]) {
                     result.errors.push(`Book at index ${i} is missing required field: ${field}`);
                 }
             }
-            
+
             // Check for duplicate IDs
             if (book.id) {
                 if (ids.has(book.id)) {
@@ -133,23 +135,23 @@ export function importFromJSON(jsonString) {
                 }
                 ids.add(book.id);
             }
-            
+
             // Validate pages is a number
             if (book.pages && isNaN(parseInt(book.pages))) {
                 result.errors.push(`Book at index ${i} has invalid pages value: ${book.pages}`);
             }
-            
+
             // Validate date format (YYYY-MM-DD)
             if (book.date && !/^\d{4}-\d{2}-\d{2}$/.test(book.date)) {
                 result.errors.push(`Book at index ${i} has invalid date format: ${book.date}`);
             }
         }
-        
+
         // If there are any errors, return invalid
         if (result.errors.length > 0) {
             return result;
         }
-        
+
         result.valid = true;
         result.data = data;
         return result;
