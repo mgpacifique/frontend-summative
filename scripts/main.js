@@ -43,6 +43,9 @@ function init() {
     // Set up event listeners
     setupEventListeners();
 
+    // Check for first visit
+    checkFirstVisit();
+
     // Initial render
     refreshUI();
 
@@ -88,6 +91,10 @@ function setupEventListeners() {
 
     // Target pages
     document.getElementById('set-target-btn').addEventListener('click', handleSetTarget);
+
+    // Onboarding buttons
+    document.getElementById('load-sample-btn').addEventListener('click', handleLoadSample);
+    document.getElementById('start-fresh-btn').addEventListener('click', handleStartFresh);
 
     // TODO: Add event delegation for edit and delete buttons
     document.addEventListener('click', handleActionButtons);
@@ -309,6 +316,57 @@ function handleSetTarget() {
         // Refresh dashboard to update progress bar
         refreshUI();
     });
+}
+
+/**
+ * Check if this is the user's first visit
+ */
+function checkFirstVisit() {
+    // If we have books, assume not first visit (or user already imported)
+    // But requirement says "if library is empty" essentially, or specific flag.
+    // User asked: "asking user to choose... whether they will complete it with there own entries"
+    // Let's use a specific flag 'visited'.
+    const visited = localStorage.getItem('visited');
+    const hasBooks = getBooks().length > 0;
+
+    if (!visited && !hasBooks) {
+        document.getElementById('onboarding-modal').classList.remove('hidden');
+    }
+}
+
+/**
+ * Handle "Load Sample Data"
+ */
+function handleLoadSample() {
+    fetch('assets/seed/seed.json')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load seed data');
+            return response.json();
+        })
+        .then(data => {
+            if (Array.isArray(data)) {
+                setBooks(data);
+                localStorage.setItem('visited', 'true');
+                document.getElementById('onboarding-modal').classList.add('hidden');
+                refreshUI();
+                showStatus('search-status', 'Sample data loaded successfully! Enjoy your charts.', 'success');
+            } else {
+                console.error('Seed data is not an array');
+            }
+        })
+        .catch(err => {
+            console.error('Error loading sample data:', err);
+            alert('Failed to load sample data. Please try importing manually.');
+        });
+}
+
+/**
+ * Handle "Start Fresh"
+ */
+function handleStartFresh() {
+    localStorage.setItem('visited', 'true');
+    document.getElementById('onboarding-modal').classList.add('hidden');
+    showStatus('search-status', 'Welcome! Start by adding your first book.', 'info');
 }
 
 /**
