@@ -275,6 +275,7 @@ function handleImport() {
 
         // TODO: Add more thorough validation
         setBooks(result.data);
+        localStorage.setItem('visited', 'true');
         refreshUI();
         showStatus('settings-status', 'Data imported successfully!', 'success');
         fileInput.value = '';
