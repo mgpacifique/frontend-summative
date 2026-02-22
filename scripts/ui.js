@@ -238,7 +238,7 @@ function renderTopTagsChart(books) {
     const total = books.length;
     let currentDeg = 0;
     const gradientParts = [];
-    const colors = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#64748b'];
+    const colors = ['#7c4d8b', '#8a6f63', '#b38ac4', '#b07a5f', '#9f8b7a', '#5a3a68'];
 
     legend.innerHTML = '';
 

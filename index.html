@@ -17,30 +17,36 @@
     <!-- Skip to content link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Header -->
-    <header role="banner">
-        <div class="container">
-            <h1>Book & Notes Vault</h1>
-            <p class="tagline">Your personal reading catalog</p>
-        </div>
-    </header>
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="Sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon" aria-hidden="true">📚</div>
+                <div>
+                    <h1>Book & Notes Vault</h1>
+                    <p class="tagline">Reading dashboard</p>
+                </div>
+            </div>
 
-    <!-- Navigation -->
-    <nav role="navigation" aria-label="Main navigation">
-        <div class="container">
-            <ul class="nav-list">
-                <li><a href="#dashboard" class="nav-link active" data-section="dashboard">Dashboard</a></li>
-                <li><a href="#books" class="nav-link" data-section="books">My Books</a></li>
-                <li><a href="#add-book" class="nav-link" data-section="add-book">Add Book</a></li>
-                <li><a href="#settings" class="nav-link" data-section="settings">Settings</a></li>
-                <li><a href="#about" class="nav-link" data-section="about">About</a></li>
-            </ul>
-        </div>
-    </nav>
+            <nav role="navigation" aria-label="Main navigation">
+                <ul class="nav-list">
+                    <li><a href="#dashboard" class="nav-link active" data-section="dashboard">Dashboard</a></li>
+                    <li><a href="#books" class="nav-link" data-section="books">My Books</a></li>
+                    <li><a href="#add-book" class="nav-link" data-section="add-book">Add Book</a></li>
+                    <li><a href="#settings" class="nav-link" data-section="settings">Settings</a></li>
+                    <li><a href="#about" class="nav-link" data-section="about">About</a></li>
+                </ul>
+            </nav>
+        </aside>
 
-    <!-- Main Content -->
-    <main id="main-content" role="main">
-        <div class="container">
+        <div class="app-main">
+            <header class="topbar" role="banner">
+                <button id="sidebar-toggle" class="icon-btn" type="button" aria-label="Toggle navigation">☰</button>
+                <p class="topbar-title">Library Overview</p>
+            </header>
+
+            <!-- Main Content -->
+            <main id="main-content" role="main">
+                <div class="container">
 
             <!-- Dashboard Section -->
             <section id="dashboard" class="content-section active" aria-labelledby="dashboard-heading">
@@ -105,8 +111,6 @@
                     </div>
                 </div>
 
-                <!-- Legacy Trend (Hidden or Removed - keeping purely for history if needed, but user asked for replacement) -->
-                <!-- <div id="trend-chart" class="trend-chart"></div> -->
             </section>
 
             <!-- Books List Section -->
@@ -258,6 +262,14 @@
                     <h3>Display Preferences</h3>
 
                     <div class="setting-item">
+                        <label for="dark-mode-toggle">Theme:</label>
+                        <label class="toggle-wrap" for="dark-mode-toggle">
+                            <input type="checkbox" id="dark-mode-toggle">
+                            <span>Enable Dark Mode</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
                         <label for="page-unit">Page Count Display:</label>
                         <select id="page-unit">
                             <option value="pages">Pages</option>
@@ -310,15 +322,17 @@
                 </div>
             </section>
 
-        </div>
-    </main>
+                </div>
+            </main>
 
-    <!-- Footer -->
-    <footer role="contentinfo">
-        <div class="container">
-            <p>&copy; 2026 Book & Notes Vault.</p>
+            <!-- Footer -->
+            <footer role="contentinfo">
+                <div class="container">
+                    <p>&copy; 2026 Book & Notes Vault.</p>
+                </div>
+            </footer>
         </div>
-    </footer>
+    </div>
 
     <!-- Onboarding Modal -->
     <div id="onboarding-modal" class="modal-overlay hidden" role="dialog" aria-modal="true"

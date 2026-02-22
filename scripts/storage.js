@@ -44,11 +44,12 @@ export function loadSettings() {
         const settings = localStorage.getItem(SETTINGS_KEY);
         return settings ? JSON.parse(settings) : {
             pageUnit: 'pages',
-            targetPages: 1000
+            targetPages: 1000,
+            theme: 'light'
         };
     } catch (error) {
         console.error('Error loading settings:', error);
-        return { pageUnit: 'pages', targetPages: 1000 };
+        return { pageUnit: 'pages', targetPages: 1000, theme: 'light' };
     }
 }
 

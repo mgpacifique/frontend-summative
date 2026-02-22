@@ -1,14 +1,13 @@
-/* ===========================
-   CSS Variables & Theme Colors
-   =========================== */
+
+   /* CSS Variables & Theme Colors */
 :root {
     /* Colors */
-    --primary-color: #2563eb;
-    --primary-dark: #1e40af;
-    --primary-light: #60a5fa;
+    --primary-color: #7c4d8b;
+    --primary-dark: #5a3a68;
+    --primary-light: #a27ab0;
 
-    --secondary-color: #64748b;
-    --secondary-dark: #475569;
+    --secondary-color: #8a6f63;
+    --secondary-dark: #6e574e;
 
     --success-color: #10b981;
     --warning-color: #f59e0b;
@@ -26,6 +25,9 @@
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --focus-ring: rgba(124, 77, 139, 0.2);
+    --footer-bg: #1a2233;
+    --footer-text: #dbe4f0;
 
     /* Spacing */
     --spacing-xs: 0.25rem;
@@ -48,6 +50,33 @@
     --radius-sm: 0.25rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
+
+    --sidebar-width: 270px;
+}
+
+[data-theme="dark"] {
+    --primary-color: #b38ac4;
+    --primary-dark: #8e679e;
+    --primary-light: #d1b2de;
+
+    --secondary-color: #b79f93;
+    --secondary-dark: #947d72;
+
+    --bg-primary: #1b2433;
+    --bg-secondary: #121826;
+    --bg-tertiary: #263143;
+
+    --text-primary: #e2e8f0;
+    --text-secondary: #c5d0e0;
+    --text-muted: #9aa9c0;
+
+    --border-color: #334155;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 10px 20px -8px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 20px 30px -12px rgba(0, 0, 0, 0.55);
+    --focus-ring: rgba(179, 138, 196, 0.25);
+    --footer-bg: #1a2233;
+    --footer-text: #dbe4f0;
 }
 
 /* ===========================
@@ -58,8 +87,12 @@ body {
     color: var(--text-primary);
     background-color: var(--bg-secondary);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+}
+
+.app-shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    min-height: 100vh;
 }
 
 /* ===========================
@@ -85,52 +118,68 @@ body {
    =========================== */
 .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
     padding: 0 var(--spacing-md);
 }
 
 /* ===========================
-   Header
+   Sidebar / Navigation
    =========================== */
-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    color: white;
-    padding: var(--spacing-xl) 0;
-    box-shadow: var(--shadow-md);
-}
-
-header h1 {
-    font-size: clamp(1.5rem, 5vw, 2.5rem);
-    margin-bottom: var(--spacing-xs);
-}
-
-header .tagline {
-    font-size: 0.95rem;
-    opacity: 0.9;
-}
-
-/* ===========================
-   Navigation
-   =========================== */
-nav {
-    background-color: var(--bg-primary);
-    border-bottom: 2px solid var(--border-color);
+.sidebar {
+    background: var(--bg-primary);
+    border-right: 1px solid var(--border-color);
+    padding: var(--spacing-xl) var(--spacing-md);
     position: sticky;
     top: 0;
-    z-index: 50;
-    box-shadow: var(--shadow-sm);
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+}
+
+.brand-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    display: grid;
+    place-content: center;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    font-size: 1.35rem;
+}
+
+.sidebar-brand h1 {
+    font-size: 1.35rem;
+    margin: 0;
+}
+
+.tagline {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.sidebar nav {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    position: static;
 }
 
 .nav-list {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: var(--spacing-xs);
-    padding: var(--spacing-sm) 0;
+    padding: 0;
 }
 
 .nav-link {
-    padding: var(--spacing-sm) var(--spacing-md);
+    display: block;
+    padding: 0.7rem 0.9rem;
     color: var(--text-secondary);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
@@ -148,6 +197,44 @@ nav {
 .nav-link.active {
     background-color: var(--primary-color);
     color: white;
+}
+
+.app-main {
+    min-width: 0;
+}
+
+.topbar {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    background: color-mix(in srgb, var(--bg-primary) 85%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    padding: 0 var(--spacing-xl);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.topbar-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.icon-btn {
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    display: grid;
+    place-content: center;
 }
 
 /* ===========================
@@ -184,7 +271,7 @@ section h2 {
     font-size: clamp(1.5rem, 4vw, 2rem);
     margin-bottom: var(--spacing-lg);
     color: var(--text-primary);
-    border-bottom: 3px solid var(--primary-color);
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: var(--spacing-sm);
 }
 
@@ -587,7 +674,7 @@ mark {
 .form-group select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .form-group input:invalid:not(:placeholder-shown),
@@ -689,6 +776,23 @@ mark {
     min-width: 200px;
 }
 
+.toggle-wrap {
+    min-width: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+}
+
+.toggle-wrap input {
+    width: 16px;
+    height: 16px;
+}
+
 /* ===========================
    About Section
    =========================== */
@@ -730,11 +834,11 @@ mark {
    Footer
    =========================== */
 footer {
-    background-color: var(--text-primary);
-    color: white;
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
     padding: var(--spacing-lg) 0;
     text-align: center;
-    margin-top: var(--spacing-2xl);
+    margin-top: var(--spacing-xl);
 }
 
 /* ===========================

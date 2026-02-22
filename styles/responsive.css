@@ -10,18 +10,9 @@
     .container {
         padding: 0 var(--spacing-sm);
     }
-    
-    header h1 {
-        font-size: 1.25rem;
-    }
-    
-    .nav-list {
-        flex-direction: column;
-    }
-    
-    .nav-link {
-        width: 100%;
-        text-align: center;
+
+    .sidebar-brand h1 {
+        font-size: 1.1rem;
     }
 }
 
@@ -29,11 +20,6 @@
    Medium Devices (tablets, 768px and up)
    =========================== */
 @media (min-width: 768px) {
-    /* Navigation */
-    .nav-list {
-        justify-content: center;
-    }
-    
     /* Stats Grid */
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -79,14 +65,13 @@
         grid-template-columns: repeat(4, 1fr);
     }
     
-    /* Navigation */
-    .nav-list {
-        justify-content: flex-start;
-    }
-    
     /* Main content wider spacing */
     main {
         padding: var(--spacing-2xl) 0;
+    }
+
+    .icon-btn {
+        display: none;
     }
     
     section h2 {
@@ -98,6 +83,28 @@
    Small Devices - Mobile Cards View
    =========================== */
 @media (max-width: 767px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: min(88vw, 290px);
+        transform: translateX(-100%);
+        transition: transform var(--transition-normal);
+        z-index: 60;
+    }
+
+    body.sidebar-open .sidebar {
+        transform: translateX(0);
+    }
+
+    .topbar {
+        padding: 0 var(--spacing-md);
+    }
+
     /* Hide table, show cards */
     .table-responsive {
         display: none;

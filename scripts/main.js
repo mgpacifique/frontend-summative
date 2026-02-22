@@ -4,7 +4,7 @@
  * Coordinates all modules and handles events
  */
 
-import { initState, getBooks, addBook, updateBook, deleteBook, setBooks, getBookById } from './state.js';
+import { initState, getBooks, addBook, updateBook, deleteBook, setBooks, getBookById, getSettings, updateSettings } from './state.js';
 import { validateBook, getTodayDate } from './validators.js';
 import { compileRegex, filterBooks, sortBooks } from './search.js';
 import {
@@ -31,14 +31,25 @@ function init() {
     // Load data from localStorage
     initState();
 
-    // Load settings and set target input
-    import('./state.js').then(({ getSettings }) => {
-        const settings = getSettings();
-        const targetInput = document.getElementById('pages-target');
-        if (targetInput && settings.targetPages) {
-            targetInput.value = settings.targetPages;
-        }
-    });
+    // Load settings and apply them
+    const settings = getSettings();
+    const targetInput = document.getElementById('pages-target');
+    const pageUnit = document.getElementById('page-unit');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+    if (targetInput && settings.targetPages) {
+        targetInput.value = settings.targetPages;
+    }
+
+    if (pageUnit && settings.pageUnit) {
+        pageUnit.value = settings.pageUnit;
+    }
+
+    const preferredTheme = settings.theme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(preferredTheme);
+    if (darkModeToggle) {
+        darkModeToggle.checked = preferredTheme === 'dark';
+    }
 
     // Set up event listeners
     setupEventListeners();
@@ -88,9 +99,17 @@ function setupEventListeners() {
     document.getElementById('export-btn').addEventListener('click', handleExport);
     document.getElementById('import-btn').addEventListener('click', handleImport);
     document.getElementById('clear-data-btn').addEventListener('click', handleClearData);
+    document.getElementById('page-unit').addEventListener('change', handlePageUnitChange);
+    document.getElementById('dark-mode-toggle').addEventListener('change', handleThemeToggle);
 
     // Target pages
     document.getElementById('set-target-btn').addEventListener('click', handleSetTarget);
+
+    // Sidebar toggle (mobile)
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', handleSidebarToggle);
+    }
 
     // Onboarding buttons
     document.getElementById('load-sample-btn').addEventListener('click', handleLoadSample);
@@ -109,6 +128,10 @@ function handleNavigation(e) {
     const sectionId = e.target.dataset.section;
     if (sectionId) {
         navigateToSection(sectionId);
+
+        if (window.innerWidth <= 767) {
+            document.body.classList.remove('sidebar-open');
+        }
     }
 }
 
@@ -309,14 +332,46 @@ function handleSetTarget() {
         return;
     }
 
-    // Save target to settings
-    import('./state.js').then(({ updateSettings, getSettings }) => {
-        updateSettings({ targetPages: target });
-        showStatus('settings-status', `Reading goal set to ${target.toLocaleString()} pages!`, 'success');
+    updateSettings({ targetPages: target });
+    showStatus('settings-status', `Reading goal set to ${target.toLocaleString()} pages!`, 'success');
 
-        // Refresh dashboard to update progress bar
-        refreshUI();
-    });
+    // Refresh dashboard to update progress bar
+    refreshUI();
+}
+
+/**
+ * Handle page unit preference changes
+ * @param {Event} e - Change event
+ */
+function handlePageUnitChange(e) {
+    updateSettings({ pageUnit: e.target.value });
+    showStatus('settings-status', 'Display preference updated', 'success');
+}
+
+/**
+ * Handle theme toggle changes
+ * @param {Event} e - Change event
+ */
+function handleThemeToggle(e) {
+    const theme = e.target.checked ? 'dark' : 'light';
+    applyTheme(theme);
+    updateSettings({ theme });
+    showStatus('settings-status', `${theme === 'dark' ? 'Dark' : 'Light'} mode enabled`, 'success');
+}
+
+/**
+ * Apply theme to document
+ * @param {string} theme - light or dark
+ */
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+}
+
+/**
+ * Toggle sidebar visibility on mobile
+ */
+function handleSidebarToggle() {
+    document.body.classList.toggle('sidebar-open');
 }
 
 /**
@@ -325,7 +380,6 @@ function handleSetTarget() {
 function checkFirstVisit() {
     // If we have books, assume not first visit (or user already imported)
     // But requirement says "if library is empty" essentially, or specific flag.
-    // User asked: "asking user to choose... whether they will complete it with there own entries"
     // Let's use a specific flag 'visited'.
     const visited = localStorage.getItem('visited');
     const hasBooks = getBooks().length > 0;
