@@ -4,7 +4,7 @@ A fully accessible, responsive, vanilla HTML/CSS/JS application for cataloging a
 
 ## 🌐 Live Demo
 
-**GitHub Pages:** www.booklogger.tech
+**GitHub Pages:** www.booklogger.tech </br>
 **Video Demo:** https://drive.google.com/file/d/1c8rjDxr_bptwg7dMeAD2vhESC8NiWmkl/view?usp=sharing
 ## 📖 Table of Contents
 
